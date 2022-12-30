@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>element-watermark</title>
+</head>
+<body>
+<p>原图</p>
+<img id="img1" src="./img/1.png" width="464" height="308" alt="1.png">
+<p>可见水印</p>
+<canvas id="watermark1" width="464" height="308" style="border: 1px solid #d3d3d3;"></canvas>
+<p>不可见水印</p>
+<canvas id="watermark2" width="464" height="308" style="border: 1px solid #d3d3d3;"></canvas>
+<p>结果图</p>
+<canvas id="watermark3" width="464" height="308" style="border: 1px solid #d3d3d3;"></canvas>
+<script>
+    //可见水印
+    var c1 = document.getElementById("watermark1");
+    var ctx1 = c1.getContext("2d");
+    let img1 = new Image();
+    img1.onload = function() {
+        ctx1.drawImage(img1, 0, 0, c1.width, c1.height)
+        const txt = '@ 任俊宇201870202'
+        ctx1.fillStyle = '#fff';
+        ctx1.globalAlpha = 1;
+        ctx1.font = `30px 微软雅黑 light`;
+        ctx1.textAlign = 'right';
+        ctx1.fillText(txt, c1.width - 10, c1.height - 10);
+    }
+    img1.src = "./img/1.png";
+
+    //不可见水印
+    function encode(src) {
+        var textData;
+        var c =  document.getElementById("watermark2");
+        var ctx = c.getContext("2d");
+        ctx.font = `30px 微软雅黑 light`;
+        ctx1.textAlign = 'right';
+        ctx.fillText("@任俊宇201870202", 150, 100);
+        textData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data;
+        var img = new Image();
+        var originalData;
+        img.onload = function(){
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            originalData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+            mergeData(ctx, textData,"G",originalData);
+        }
+        img.src = src;
+        return c.toDataURL();
+    }
+    //获取RGB中某一分量对应的位和偏移量
+    function getBitOffset(color) {
+        let bit, offset;
+        switch (color) {
+            case 'R':
+                bit = 0;
+                offset = 3;
+                break;
+            case 'G':
+                bit = 1;
+                offset = 2;
+                break;
+            case 'B':
+                bit = 2;
+                offset = 1;
+                break;
+        }
+        return [bit,offset];
+    }
+    //合并原始图片数据和数字水印的rgb数据, 采用将把没有信息的像素全改成偶数, 把有信息的像素全改成奇数这种编码的方式
+    function mergeData(ctx, textData, color, originalData) {
+        let oData = originalData.data;
+        let [bit, offset] = getBitOffset(color);
+        for(var i= 0;i< oData.length; i++){
+            if (i % 4 === bit){
+                if (textData[i+offset] === 0 && oData[i] % 2 === 1){
+                    if (oData[i] === 255){
+                        oData[i]--;
+                    }else {
+                        oData[i]++;
+                    }
+                }else if (textData[i+offset] !== 0 && (oData[i] % 2 === 0)){
+                    oData[i]++;
+                }
+            }
+        }
+        ctx.putImageData(originalData, 0, 0);
+    }
+    //图片解码
+    function processData(ctx, originalData, color) {
+        let data = originalData.data;
+        let [bit, offset]=getBitOffset(color);
+        for (var i = 0; i < data.length; i++) {
+            if (i % 4 === bit) {
+                if (data[i] % 2 === 0) {
+                    data[i] = 0;
+                } else {
+                    data[i] = 255;
+                }
+            } else if (i % 4 !== 3) {
+                data[i] = 0;
+            }
+        }
+        ctx.putImageData(originalData, 0, 0);
+    }
+    function decode(src, color) {
+        var c = document.getElementById("watermark3");
+        var ctx = c.getContext("2d");
+        var img = new Image();
+        var originalData;
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+            originalData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+            processData(ctx, originalData, color)
+        }
+        img.src = src;
+    }
+    var url = encode("./img/1.png");
+    decode(url, "G")
+</script>
+</body>
+</html>

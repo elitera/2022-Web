@@ -1,0 +1,45 @@
+body.dark{
+    color: #eee;
+    background: #333;
+}
+body.dark .head{
+    color: #eee;
+    background: #333;
+}
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: lightcoral;
+    position: sticky;
+}
+li{
+    float: left;
+}
+li b{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    background-color: yellowgreen;
+}
+li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    border-left: 1px solid lightsteelblue;
+}
+.button1 {background-color: #555555;}
+.waterfall {
+    column-count:3;
+    column-gap: 0;
+}
+.item {
+    box-sizing: border-box;
+    break-inside: avoid;
+    padding:10px;
+}

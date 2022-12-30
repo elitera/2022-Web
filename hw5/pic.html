@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Picture Process</title>
+    <script src="node_modules/lena.js/dist/browser.js"></script>
+    <script src="filter.js"></script>
+</head>
+<body onload="addImg()">
+<canvas id="img" width="600" height="400" style="border: 1px solid #d3d3d3;"></canvas>
+<p>Add Filter</p>
+<button onclick="addFilter1()">Red</button>
+<button onclick="addFilter2()">Green</button>
+<button onclick="addFilter3()">Mirror</button>
+<button onclick="addImg()">Clear</button>
+</body>
+</html>
